@@ -3,4 +3,13 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="appMarriedWhite">#FFFFFF</color>
+    <color name="transparent">#00ff0000</color>
+
+
+    <color name="first_tutorial_background_color">#DE005B</color>
+    <color name="second_tutorial_background_color">#FFCF1E</color>
+    <color name="third_tutorial_background_color">#00BDF2</color>
+    <color name="fourth_tutorial_background_color">#81C80C</color>
+
 </resources>
