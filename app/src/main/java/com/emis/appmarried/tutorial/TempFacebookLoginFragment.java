@@ -52,27 +52,65 @@ public class TempFacebookLoginFragment extends PageFragment{
         View root = inflater.inflate(R.layout.temp_facebook_login_fragment, container, false);
 
         loginButton = (LoginButton)root.findViewById(R.id.login_button);
-
-        //If I am in a fragment, setFragment for facebook login implementation.
         loginButton.setFragment(this);
+
+        try {
+            PackageInfo info = getActivity().getPackageManager().getPackageInfo(
+                    "com.emis.appmarried",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+
+        } catch (NoSuchAlgorithmException e) {
+
+        }
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Log.d("FacebookFragment", "OK");
+                Log.d("Facebook", "OK");
             }
 
             @Override
             public void onCancel() {
-                Log.d("FacebookFragment", "KO onCancel()");
+                Log.d("Facebook", "KO onCancel()");
 
             }
 
             @Override
             public void onError(FacebookException error) {
-                Log.d("FacebookFragment", "KO onError()");
+                Log.d("Facebook", "KO onError()");
             }
         });
+
+//        LoginManager.getInstance().registerCallback(callbackManager,
+//                new FacebookCallback<LoginResult>() {
+//                    @Override
+//                    public void onSuccess(LoginResult loginResult) {
+//                        boolean enableButtons = AccessToken.getCurrentAccessToken() != null;
+//                        Profile profile = Profile.getCurrentProfile();
+//                        if (enableButtons && profile != null) {
+////                            profilePictureView.setProfileId(profile.getId());
+//                            Log.d("Facebook", profile.getFirstName());
+//                        } else {
+//                            Log.d("Facebook", "No profile name");
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                        // App code
+//                    }
+//
+//                    @Override
+//                    public void onError(FacebookException exception) {
+//                        // App code
+//                    }
+//                });
 
         return root;
     }
@@ -93,7 +131,7 @@ public class TempFacebookLoginFragment extends PageFragment{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("FacebookFragment", "onActivityResult() fragment");
+        Log.d("Facebook", "onActivityResult() fragment");
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }
