@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -17,30 +18,44 @@ import android.view.ViewGroup;
 import com.cleveroad.slidingtutorial.Direction;
 import com.cleveroad.slidingtutorial.PageFragment;
 import com.cleveroad.slidingtutorial.TransformItem;
+import com.emis.appmarried.MyResultReceiver;
 import com.emis.appmarried.R;
+import com.emis.appmarried.ServerManagerService;
+import com.emis.appmarried.ServerOperations;
+import com.emis.appmarried.utils.Utils;
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONObject;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * Created by jo5 on 15/05/18.
  */
 
-public class TempFacebookLoginFragment extends PageFragment{
+public class TempFacebookLoginFragment extends PageFragment implements MyResultReceiver.Receiver{
 
     CallbackManager callbackManager;
     LoginButton loginButton;
+    private MyResultReceiver mReceiver;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         callbackManager = CallbackManager.Factory.create();
+
+        mReceiver = new MyResultReceiver(new Handler());
+
+        mReceiver.setReceiver(this);
 
     }
 
@@ -52,27 +67,17 @@ public class TempFacebookLoginFragment extends PageFragment{
         View root = inflater.inflate(R.layout.temp_facebook_login_fragment, container, false);
 
         loginButton = (LoginButton)root.findViewById(R.id.login_button);
+
+        //Login Button in a fragment.
         loginButton.setFragment(this);
-
-        try {
-            PackageInfo info = getActivity().getPackageManager().getPackageInfo(
-                    "com.emis.appmarried",
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-
-        } catch (NoSuchAlgorithmException e) {
-
-        }
+        loginButton.setReadPermissions(Arrays.asList("email"));
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.d("Facebook", "OK");
+                String facebookAccessToken = AccessToken.getCurrentAccessToken().getToken();
+                ServerOperations.sendUserAuthenticate(getActivity(), facebookAccessToken, mReceiver);
             }
 
             @Override
@@ -133,5 +138,11 @@ public class TempFacebookLoginFragment extends PageFragment{
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("Facebook", "onActivityResult() fragment");
         callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        Log.d("Facebook", "-------------" + resultData.getString(ServerManagerService.API_RESPONSE));
     }
 }

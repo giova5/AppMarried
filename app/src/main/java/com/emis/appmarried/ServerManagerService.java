@@ -2,6 +2,8 @@ package com.emis.appmarried;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -16,16 +18,7 @@ import org.json.JSONObject;
 
 public class ServerManagerService extends IntentService {
 
-
-
-    public interface ServerManagerResp{
-        void onResponseReceived(Utils.EventType eventType, int response, JSONObject jsonObject);
-    }
-
     private static final String TAG = "ServerManagerService";
-
-    private ServerManagerResp listener;
-
 
     public static final String RESPONSE_CODE = "responseCode";
     public static final int NO_INTERNET_CONNECTION = -999;
@@ -40,6 +33,10 @@ public class ServerManagerService extends IntentService {
     //Requests parameters
     public static final String PARAMETER_FB_ACCESS_TOKEN = "PARAMETER_FB_ACCESS_TOKEN";
     public static final String PARAMETER_GET_ACCESS_TOKEN = "PARAMETER_GET_ACCESS_TOKEN";
+    public static final String PARAMETER_RECEIVER_TAG = "PARAMETER_RECEIVER_TAG";
+
+    public static final String API_RESPONSE = "API_RESPONSE";
+    public static final String API_EVENT_TYPE = "API_EVENT_TYPE";
 
     private int currentResponseCode;
     private JSONObject currentResponse;
@@ -69,6 +66,7 @@ public class ServerManagerService extends IntentService {
         }
 
         String command = intent.getStringExtra(COMMAND);
+        ResultReceiver rec = intent.getParcelableExtra(PARAMETER_RECEIVER_TAG);
 
         switch (command){
             case COMMAND_USERS_LOGIN:
@@ -105,9 +103,11 @@ public class ServerManagerService extends IntentService {
                 break;
         }
 
-        if(listener != null) {
-            listener.onResponseReceived(currentEventType, currentResponseCode, currentResponse);
-        }
+        Bundle b = new Bundle();
+        b.putString(API_RESPONSE, currentResponse.toString());
+        b.putInt(RESPONSE_CODE, currentResponseCode);
+        b.putString(API_EVENT_TYPE, currentEventType.name());
+        rec.send(currentResponseCode, b);
     }
 
     /**
@@ -124,11 +124,6 @@ public class ServerManagerService extends IntentService {
             e.printStackTrace();
         }
         return jsonResponse;
-    }
-
-    // Assign the listener implementing events interface that will receive the events
-    public void setServerManagerRespListener(ServerManagerResp listener) {
-        this.listener = listener;
     }
 
     private int getIntFromString(String str){

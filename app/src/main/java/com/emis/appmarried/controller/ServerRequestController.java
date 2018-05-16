@@ -46,7 +46,6 @@ public class ServerRequestController {
     private JSONObject jsonResponse;
     private String accessToken;
 
-
     public ServerRequestController(Utils.EventType requestName, String method, String body, int maxRetries, String accessToken){
         this.requestName = requestName;
         this.method = method;

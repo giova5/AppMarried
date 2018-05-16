@@ -64,10 +64,11 @@ public class ServerOperations {
 
     /*********************************** HTTP REQUESTS IMPLEMENTATION ************************************/
 
-    public static void sendUserAuthenticate(Context context, String facebookAccessToken){
+    public static void sendUserAuthenticate(Context context, String facebookAccessToken, MyResultReceiver callback){
         Intent smIntent = new Intent(context, ServerManagerService.class);
         smIntent.putExtra(ServerManagerService.COMMAND, ServerManagerService.COMMAND_USERS_LOGIN);
         smIntent.putExtra(ServerManagerService.PARAMETER_FB_ACCESS_TOKEN, facebookAccessToken);
+        smIntent.putExtra(ServerManagerService.PARAMETER_RECEIVER_TAG, callback);
         context.startService(smIntent);
     }
 
