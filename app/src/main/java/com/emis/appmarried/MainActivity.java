@@ -1,20 +1,23 @@
 package com.emis.appmarried;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.cleveroad.slidingtutorial.TutorialFragment;
 import com.cleveroad.slidingtutorial.TutorialOptions;
 import com.cleveroad.slidingtutorial.TutorialPageProvider;
+import com.emis.appmarried.tutorial.TempFacebookLoginFragment;
 import com.emis.appmarried.tutorial.TutorialPageFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int PAGES = 4;
+    private static final int PAGES = 5;
     private static final int[] pagesColors = new int[]{Color.parseColor("#DE005B"), Color.parseColor("#FFCF1E"), Color.parseColor("#00BDF2"), Color.parseColor("#81C80C")};
 
     @Override
@@ -40,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
                         return TutorialPageFragment.newInstance(TutorialPageFragment.THIRD_TUTORIAL_PAGE);
                     case 3:
                         return TutorialPageFragment.newInstance(TutorialPageFragment.FOURTH_TUTORIAL_PAGE);
+                    case 4:
+                        return new TempFacebookLoginFragment();
                     default:
                         return TutorialPageFragment.newInstance(TutorialPageFragment.FIRST_TUTORIAL_PAGE);
                 }
@@ -66,4 +71,9 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("Facebook", "onActivityResult() activity");
+    }
 }
