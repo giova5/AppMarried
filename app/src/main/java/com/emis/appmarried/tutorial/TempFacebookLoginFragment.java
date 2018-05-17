@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -17,30 +18,49 @@ import android.view.ViewGroup;
 import com.cleveroad.slidingtutorial.Direction;
 import com.cleveroad.slidingtutorial.PageFragment;
 import com.cleveroad.slidingtutorial.TransformItem;
+import com.emis.appmarried.MyResultReceiver;
 import com.emis.appmarried.R;
+import com.emis.appmarried.ServerManagerService;
+import com.emis.appmarried.ServerOperations;
+import com.emis.appmarried.controller.ServerRequestController;
+import com.emis.appmarried.utils.Utils;
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+
+import static com.emis.appmarried.ServerManagerService.API_EVENT_TYPE;
+import static com.emis.appmarried.ServerManagerService.API_RESPONSE;
 
 /**
  * Created by jo5 on 15/05/18.
  */
 
-public class TempFacebookLoginFragment extends PageFragment{
+public class TempFacebookLoginFragment extends PageFragment implements MyResultReceiver.Receiver{
 
     CallbackManager callbackManager;
     LoginButton loginButton;
+    private MyResultReceiver mReceiver;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         callbackManager = CallbackManager.Factory.create();
+
+        mReceiver = new MyResultReceiver(new Handler());
+
+        mReceiver.setReceiver(this);
 
     }
 
@@ -53,26 +73,54 @@ public class TempFacebookLoginFragment extends PageFragment{
 
         loginButton = (LoginButton)root.findViewById(R.id.login_button);
 
-        //If I am in a fragment, setFragment for facebook login implementation.
+        //Login Button in a fragment.
         loginButton.setFragment(this);
+        loginButton.setReadPermissions(Arrays.asList("email"));
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Log.d("FacebookFragment", "OK");
+                Log.d("Facebook", "OK");
+                String facebookAccessToken = AccessToken.getCurrentAccessToken().getToken();
+                ServerOperations.sendUserAuthenticate(getActivity(), facebookAccessToken, mReceiver);
             }
 
             @Override
             public void onCancel() {
-                Log.d("FacebookFragment", "KO onCancel()");
+                Log.d("Facebook", "KO onCancel()");
 
             }
 
             @Override
             public void onError(FacebookException error) {
-                Log.d("FacebookFragment", "KO onError()");
+                Log.d("Facebook", "KO onError()");
             }
         });
+
+//        LoginManager.getInstance().registerCallback(callbackManager,
+//                new FacebookCallback<LoginResult>() {
+//                    @Override
+//                    public void onSuccess(LoginResult loginResult) {
+//                        boolean enableButtons = AccessToken.getCurrentAccessToken() != null;
+//                        Profile profile = Profile.getCurrentProfile();
+//                        if (enableButtons && profile != null) {
+////                            profilePictureView.setProfileId(profile.getId());
+//                            Log.d("Facebook", profile.getFirstName());
+//                        } else {
+//                            Log.d("Facebook", "No profile name");
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                        // App code
+//                    }
+//
+//                    @Override
+//                    public void onError(FacebookException exception) {
+//                        // App code
+//                    }
+//                });
 
         return root;
     }
@@ -93,7 +141,24 @@ public class TempFacebookLoginFragment extends PageFragment{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("FacebookFragment", "onActivityResult() fragment");
+        Log.d("Facebook", "onActivityResult() fragment");
         callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+//        Log.d("Facebook", "-------------" + resultData.getString(API_RESPONSE));
+
+        try {
+            JSONObject jsonObject = new JSONObject(resultData.getString(API_RESPONSE));
+            Utils.EventType eventType = Utils.EventType.valueOf(resultData.getString(API_EVENT_TYPE));
+
+            ServerRequestController.parseServerResponse(eventType, jsonObject, resultCode);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 }
