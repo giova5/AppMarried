@@ -30,11 +30,9 @@ public class ServerOperations {
     private static String USERS = "Users/";
     private static String USER = "User/";
 
-
     private static String USERS_LOGIN = "Login/";
     private static String ACCESS_TOKEN = "AccessToken/";
-
-
+    private static String PROFILE = "Profile/";
 
     public ServerOperations(Utils.EventType eventType) {
 
@@ -48,6 +46,9 @@ public class ServerOperations {
                     break;
                 case GET_ACCESS_TOKEN:
                     currentEndPointForRequest = urlHeaderAsString + USERS + ACCESS_TOKEN;
+                    break;
+                case GET_USER_PROFILE:
+                    currentEndPointForRequest = urlHeaderAsString + USERS + PROFILE;
                     break;
                 default:
                     currentEndPointForRequest = null;
@@ -89,10 +90,11 @@ public class ServerOperations {
         return jsonResponse;
     }
 
-    public static void sendGetAccessToken(Context context, String refreshToken){
+    public static void sendGetAccessToken(Context context, String refreshToken, MyResultReceiver callback){
         Intent smIntent = new Intent(context, ServerManagerService.class);
         smIntent.putExtra(ServerManagerService.COMMAND, ServerManagerService.COMMAND_GET_ACCESS_TOKEN);
         smIntent.putExtra(ServerManagerService.PARAMETER_GET_ACCESS_TOKEN, refreshToken);
+        smIntent.putExtra(ServerManagerService.PARAMETER_RECEIVER_TAG, callback);
         context.startService(smIntent);
     }
 
@@ -116,9 +118,10 @@ public class ServerOperations {
         return sendRequest(Utils.EventType.GET_USER_PROFILE, GET_METHOD, null, RETRIES);
     }
 
-    public static void sendGetUserProfile(Context context){
+    public static void sendGetUserProfile(Context context, MyResultReceiver callback){
         Intent smIntent = new Intent(context, ServerManagerService.class);
         smIntent.putExtra(ServerManagerService.COMMAND, ServerManagerService.COMMAND_GET_USER_PROFILE);
+        smIntent.putExtra(ServerManagerService.PARAMETER_RECEIVER_TAG, callback);
         context.startService(smIntent);
     }
 

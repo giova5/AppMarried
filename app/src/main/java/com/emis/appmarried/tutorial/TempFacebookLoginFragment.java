@@ -153,8 +153,8 @@ public class TempFacebookLoginFragment extends PageFragment implements MyResultR
         try {
             JSONObject jsonObject = new JSONObject(resultData.getString(API_RESPONSE));
             Utils.EventType eventType = Utils.EventType.valueOf(resultData.getString(API_EVENT_TYPE));
+            ServerRequestController.parseServerResponse(getActivity(), eventType, jsonObject, resultCode, mReceiver);
 
-            ServerRequestController.parseServerResponse(eventType, jsonObject, resultCode);
 
         } catch (JSONException e) {
             e.printStackTrace();
