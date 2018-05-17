@@ -29,6 +29,7 @@ public class ServerManagerService extends IntentService {
     public static final String COMMAND = "COMMAND";
     public static final String COMMAND_USERS_LOGIN = "COMMAND_USERS_LOGIN";
     public static final String COMMAND_GET_ACCESS_TOKEN = "COMMAND_GET_ACCESS_TOKEN";
+    public static final String COMMAND_GET_USER_PROFILE = "COMMAND_GET_USER_PROFILE";
 
     //Requests parameters
     public static final String PARAMETER_FB_ACCESS_TOKEN = "PARAMETER_FB_ACCESS_TOKEN";
@@ -68,44 +69,48 @@ public class ServerManagerService extends IntentService {
         String command = intent.getStringExtra(COMMAND);
         ResultReceiver rec = intent.getParcelableExtra(PARAMETER_RECEIVER_TAG);
 
-        switch (command){
-            case COMMAND_USERS_LOGIN:
-                String facebookAccessToken = intent.getStringExtra(PARAMETER_FB_ACCESS_TOKEN);
-
-                try {
+        try {
+            switch (command){
+                case COMMAND_USERS_LOGIN:
+                    String facebookAccessToken = intent.getStringExtra(PARAMETER_FB_ACCESS_TOKEN);
                     ServerOperations usersLogin = new ServerOperations(Utils.EventType.USERS_LOGIN);
                     JSONObject usersLoginResponse = usersLogin.usersLogin(facebookAccessToken);
                     usersLoginResponse = checkIfInitResponse(usersLoginResponse);
                     currentResponse = usersLoginResponse;
                     currentResponseCode = Integer.valueOf(currentResponse.getString(RESPONSE_CODE));
                     currentEventType = Utils.EventType.USERS_LOGIN;
-                }catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
+                    break;
 
-            case COMMAND_GET_ACCESS_TOKEN:
-                String refreshToken = intent.getStringExtra(PARAMETER_GET_ACCESS_TOKEN);
-                try {
+                case COMMAND_GET_ACCESS_TOKEN:
+                    String refreshToken = intent.getStringExtra(PARAMETER_GET_ACCESS_TOKEN);
                     ServerOperations getAccessTokenRequest = new ServerOperations(Utils.EventType.GET_ACCESS_TOKEN);
                     JSONObject getAccessTokenResponse = getAccessTokenRequest.getAccessToken(refreshToken);
                     currentResponse = checkIfInitResponse(getAccessTokenResponse);
                     currentResponseCode = getIntFromString(currentResponse.getString(RESPONSE_CODE));
                     currentEventType = Utils.EventType.GET_ACCESS_TOKEN;
-                }catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
-            default:
-                currentResponse = null;
-                currentResponseCode = -1;
-                currentEventType = null;
-                break;
+                    break;
+
+                case COMMAND_GET_USER_PROFILE:
+                    ServerOperations getUserProfile = new ServerOperations(Utils.EventType.GET_USER_PROFILE);
+                    JSONObject getUserProfileResponse = getUserProfile.getUserProfile();
+                    currentResponse = checkIfInitResponse(getUserProfileResponse);
+                    currentResponseCode = Integer.valueOf(currentResponse.getString(RESPONSE_CODE));
+                    currentEventType = Utils.EventType.GET_USER_PROFILE;
+                    break;
+
+                default:
+                    currentResponse = null;
+                    currentResponseCode = -1;
+                    currentEventType = null;
+                    break;
+            }
+
+        }catch (JSONException e) {
+            e.printStackTrace();
         }
 
         Bundle b = new Bundle();
         b.putString(API_RESPONSE, currentResponse.toString());
-        b.putInt(RESPONSE_CODE, currentResponseCode);
         b.putString(API_EVENT_TYPE, currentEventType.name());
         rec.send(currentResponseCode, b);
     }

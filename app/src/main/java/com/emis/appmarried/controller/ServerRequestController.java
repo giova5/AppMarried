@@ -277,4 +277,24 @@ public class ServerRequestController {
         }
     }
 
+    public static void parseServerResponse(Utils.EventType eventType, JSONObject jsonResponse, int responseCode){
+
+        try {
+            switch (eventType){
+                case USERS_LOGIN:
+                    String refreshToken = jsonResponse.getString("token");
+                    //TODO: Save refresh token to db.
+                    break;
+                case GET_ACCESS_TOKEN:
+                    String accessToken = jsonResponse.getString("token");
+                    //TODO: Save access token to db (AppConfigurator).
+                    break;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }

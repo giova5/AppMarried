@@ -22,6 +22,7 @@ import com.emis.appmarried.MyResultReceiver;
 import com.emis.appmarried.R;
 import com.emis.appmarried.ServerManagerService;
 import com.emis.appmarried.ServerOperations;
+import com.emis.appmarried.controller.ServerRequestController;
 import com.emis.appmarried.utils.Utils;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -30,11 +31,15 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
+import static com.emis.appmarried.ServerManagerService.API_EVENT_TYPE;
+import static com.emis.appmarried.ServerManagerService.API_RESPONSE;
 
 /**
  * Created by jo5 on 15/05/18.
@@ -143,6 +148,17 @@ public class TempFacebookLoginFragment extends PageFragment implements MyResultR
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
-        Log.d("Facebook", "-------------" + resultData.getString(ServerManagerService.API_RESPONSE));
+//        Log.d("Facebook", "-------------" + resultData.getString(API_RESPONSE));
+
+        try {
+            JSONObject jsonObject = new JSONObject(resultData.getString(API_RESPONSE));
+            Utils.EventType eventType = Utils.EventType.valueOf(resultData.getString(API_EVENT_TYPE));
+
+            ServerRequestController.parseServerResponse(eventType, jsonObject, resultCode);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 }

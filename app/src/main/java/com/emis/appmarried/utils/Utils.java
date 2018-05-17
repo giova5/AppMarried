@@ -33,7 +33,8 @@ public class Utils {
 
     public enum EventType {
         USERS_LOGIN,
-        GET_ACCESS_TOKEN
+        GET_ACCESS_TOKEN,
+        GET_USER_PROFILE
     }
 
     public static SecretKey generateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {

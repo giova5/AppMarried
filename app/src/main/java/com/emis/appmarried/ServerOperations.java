@@ -13,6 +13,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static com.emis.appmarried.controller.ServerRequestController.GET_METHOD;
 import static com.emis.appmarried.controller.ServerRequestController.POST_METHOD;
 import static com.emis.appmarried.controller.ServerRequestController.RETRIES;
 import static com.emis.appmarried.utils.Utils.EventType.GET_ACCESS_TOKEN;
@@ -111,7 +112,15 @@ public class ServerOperations {
         return jsonResponse;
     }
 
+    public JSONObject getUserProfile(){
+        return sendRequest(Utils.EventType.GET_USER_PROFILE, GET_METHOD, null, RETRIES);
+    }
 
+    public static void sendGetUserProfile(Context context){
+        Intent smIntent = new Intent(context, ServerManagerService.class);
+        smIntent.putExtra(ServerManagerService.COMMAND, ServerManagerService.COMMAND_GET_USER_PROFILE);
+        context.startService(smIntent);
+    }
 
         /*********************************** SEND REQUEST METHOD ************************************/
 
@@ -120,12 +129,11 @@ public class ServerOperations {
         String accessToken = null;
 
         //For requests with accessToken.
-
-//        switch (eventType) {
-//            case GET_ATTESTATION:
-//                accessToken = JobApplication.getAccessToken();
-//                break;
-//        }
+        switch (eventType) {
+            case GET_USER_PROFILE:
+                accessToken = AppMarriedApplication.getAccessToken();
+                break;
+        }
 
         ServerRequestController serverRequestManager = new ServerRequestController(eventType, method, jsonObject, maxRetries, accessToken);
         return serverRequestManager.sendRequest(url, accessToken);
@@ -136,12 +144,11 @@ public class ServerOperations {
         String accessToken = null;
 
         //For requests with accessToken.
-
-//        switch (eventType) {
-//            case GET_EXHIBITORS_INFO:
-//                accessToken = JobApplication.getAccessToken();
-//                break;
-//        }
+        switch (eventType) {
+            case GET_USER_PROFILE:
+                accessToken = AppMarriedApplication.getAccessToken();
+                break;
+        }
 
         ServerRequestController serverRequestManager = new ServerRequestController(eventType, method, jsonObject, maxRetries, accessToken);
         return serverRequestManager.sendGetRequestWithParams(url);
