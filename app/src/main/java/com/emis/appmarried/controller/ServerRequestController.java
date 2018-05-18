@@ -311,7 +311,7 @@ public class ServerRequestController {
                         String email = webObj.optString("email");
                         String gender = webObj.optString("gender");
                         int age = webObj.optInt("age");
-                        String picture = webObj.optString("picture");
+                        String picture = webObj.optString("picture").replaceAll("\\/", "/");
                         String registrationDate = webObj.optString("registrationDate");
                         String lastLoginDate = webObj.optString("lastLoginDate");
                         String lastUpdateDate = webObj.optString("lastUpdateDate");

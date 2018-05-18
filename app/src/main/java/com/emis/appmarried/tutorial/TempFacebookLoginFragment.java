@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.cleveroad.slidingtutorial.Direction;
 import com.cleveroad.slidingtutorial.PageFragment;
@@ -47,8 +48,8 @@ import static com.emis.appmarried.ServerManagerService.API_RESPONSE;
 
 public class TempFacebookLoginFragment extends PageFragment implements MyResultReceiver.Receiver{
 
-    CallbackManager callbackManager;
-    LoginButton loginButton;
+    private CallbackManager callbackManager;
+    private LoginButton loginButton;
     private MyResultReceiver mReceiver;
 
 
