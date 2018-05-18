@@ -4,10 +4,15 @@ package com.emis.appmarried.controller;
  * Created by jo5 on 16/05/18.
  */
 
+import android.content.Context;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.emis.appmarried.AppMarriedApplication;
+import com.emis.appmarried.MyResultReceiver;
+import com.emis.appmarried.ServerOperations;
+import com.emis.appmarried.model.UserProfileModel;
 import com.emis.appmarried.utils.Utils;
 
 import org.json.JSONException;
@@ -277,17 +282,46 @@ public class ServerRequestController {
         }
     }
 
-    public static void parseServerResponse(Utils.EventType eventType, JSONObject jsonResponse, int responseCode){
+    public static void parseServerResponse(Context context, Utils.EventType eventType, JSONObject jsonResponse, int responseCode, MyResultReceiver callback) {
 
         try {
             switch (eventType){
                 case USERS_LOGIN:
-                    String refreshToken = jsonResponse.getString("token");
-                    //TODO: Save refresh token to db.
+                    if(responseCode == 200 || responseCode == 201) {
+                        JSONObject webObj = jsonResponse.getJSONObject("WebiRefreshToken");
+                        String refreshToken = webObj.getString("token");
+                        AppMarriedApplication.setRefreshToken(refreshToken);
+                        ServerOperations.sendGetAccessToken(context, refreshToken, callback);
+                    }
                     break;
                 case GET_ACCESS_TOKEN:
-                    String accessToken = jsonResponse.getString("token");
-                    //TODO: Save access token to db (AppConfigurator).
+                    if(responseCode == 200 || responseCode == 201) {
+                        JSONObject webObj = jsonResponse.getJSONObject("WebiAccessToken");
+                        String accessToken = webObj.getString("token");
+                        AppMarriedApplication.setAccessToken(accessToken);
+                        ServerOperations.sendGetUserProfile(context, callback);
+                    }
+                    break;
+                case GET_USER_PROFILE:
+                    if(responseCode == 200 || responseCode == 201) {
+                        JSONObject webObj = jsonResponse.getJSONObject("UserProfile");
+                        int userID = webObj.optInt("userId");
+                        String name = webObj.optString("name");
+                        String familyName = webObj.optString("familyName");
+                        String email = webObj.optString("email");
+                        String gender = webObj.optString("gender");
+                        int age = webObj.optInt("age");
+                        String picture = webObj.optString("picture").replaceAll("\\/", "/");
+                        String registrationDate = webObj.optString("registrationDate");
+                        String lastLoginDate = webObj.optString("lastLoginDate");
+                        String lastUpdateDate = webObj.optString("lastUpdateDate");
+                        String birthDate = webObj.optString("birthDate");
+
+                        UserProfileModel userProfile = new UserProfileModel(userID, name, familyName, email, gender, age, picture, registrationDate, lastLoginDate,
+                                lastUpdateDate, birthDate);
+
+                        DBManager.createUser(userProfile);
+                    }
                     break;
             }
 

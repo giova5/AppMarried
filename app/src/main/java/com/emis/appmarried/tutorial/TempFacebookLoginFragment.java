@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.cleveroad.slidingtutorial.Direction;
 import com.cleveroad.slidingtutorial.PageFragment;
@@ -47,8 +48,8 @@ import static com.emis.appmarried.ServerManagerService.API_RESPONSE;
 
 public class TempFacebookLoginFragment extends PageFragment implements MyResultReceiver.Receiver{
 
-    CallbackManager callbackManager;
-    LoginButton loginButton;
+    private CallbackManager callbackManager;
+    private LoginButton loginButton;
     private MyResultReceiver mReceiver;
 
 
@@ -153,8 +154,8 @@ public class TempFacebookLoginFragment extends PageFragment implements MyResultR
         try {
             JSONObject jsonObject = new JSONObject(resultData.getString(API_RESPONSE));
             Utils.EventType eventType = Utils.EventType.valueOf(resultData.getString(API_EVENT_TYPE));
+            ServerRequestController.parseServerResponse(getActivity(), eventType, jsonObject, resultCode, mReceiver);
 
-            ServerRequestController.parseServerResponse(eventType, jsonObject, resultCode);
 
         } catch (JSONException e) {
             e.printStackTrace();
