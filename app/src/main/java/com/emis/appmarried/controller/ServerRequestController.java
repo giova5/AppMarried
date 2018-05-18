@@ -305,17 +305,17 @@ public class ServerRequestController {
                 case GET_USER_PROFILE:
                     if(responseCode == 200 || responseCode == 201) {
                         JSONObject webObj = jsonResponse.getJSONObject("UserProfile");
-                        int userID = webObj.getInt("userId");
-                        String name = webObj.getString("name");
-                        String familyName = webObj.getString("familyName");
-                        String email = webObj.getString("email");
-                        String gender = webObj.getString("gender");
-                        int age = webObj.getInt("age");
-                        String picture = webObj.getString("picture");
-                        String registrationDate = webObj.getString("registrationDate");
-                        String lastLoginDate = webObj.getString("lastLoginDate");
-                        String lastUpdateDate = webObj.getString("lastUpdateDate");
-                        String birthDate = webObj.getString("birthDate");
+                        int userID = webObj.optInt("userId");
+                        String name = webObj.optString("name");
+                        String familyName = webObj.optString("familyName");
+                        String email = webObj.optString("email");
+                        String gender = webObj.optString("gender");
+                        int age = webObj.optInt("age");
+                        String picture = webObj.optString("picture");
+                        String registrationDate = webObj.optString("registrationDate");
+                        String lastLoginDate = webObj.optString("lastLoginDate");
+                        String lastUpdateDate = webObj.optString("lastUpdateDate");
+                        String birthDate = webObj.optString("birthDate");
 
                         UserProfileModel userProfile = new UserProfileModel(userID, name, familyName, email, gender, age, picture, registrationDate, lastLoginDate,
                                 lastUpdateDate, birthDate);
