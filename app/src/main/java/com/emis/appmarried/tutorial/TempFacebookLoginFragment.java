@@ -1,27 +1,20 @@
 package com.emis.appmarried.tutorial;
 
-import android.app.Fragment;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.cleveroad.slidingtutorial.Direction;
 import com.cleveroad.slidingtutorial.PageFragment;
 import com.cleveroad.slidingtutorial.TransformItem;
 import com.emis.appmarried.MyResultReceiver;
 import com.emis.appmarried.R;
-import com.emis.appmarried.ServerManagerService;
 import com.emis.appmarried.ServerOperations;
 import com.emis.appmarried.controller.ServerRequestController;
 import com.emis.appmarried.utils.Utils;
@@ -35,8 +28,6 @@ import com.facebook.login.widget.LoginButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import static com.emis.appmarried.ServerManagerService.API_EVENT_TYPE;
@@ -51,7 +42,6 @@ public class TempFacebookLoginFragment extends PageFragment implements MyResultR
     private CallbackManager callbackManager;
     private LoginButton loginButton;
     private MyResultReceiver mReceiver;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -98,31 +88,6 @@ public class TempFacebookLoginFragment extends PageFragment implements MyResultR
             }
         });
 
-//        LoginManager.getInstance().registerCallback(callbackManager,
-//                new FacebookCallback<LoginResult>() {
-//                    @Override
-//                    public void onSuccess(LoginResult loginResult) {
-//                        boolean enableButtons = AccessToken.getCurrentAccessToken() != null;
-//                        Profile profile = Profile.getCurrentProfile();
-//                        if (enableButtons && profile != null) {
-////                            profilePictureView.setProfileId(profile.getId());
-//                            Log.d("Facebook", profile.getFirstName());
-//                        } else {
-//                            Log.d("Facebook", "No profile name");
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancel() {
-//                        // App code
-//                    }
-//
-//                    @Override
-//                    public void onError(FacebookException exception) {
-//                        // App code
-//                    }
-//                });
-
         return root;
     }
 
@@ -155,7 +120,6 @@ public class TempFacebookLoginFragment extends PageFragment implements MyResultR
             JSONObject jsonObject = new JSONObject(resultData.getString(API_RESPONSE));
             Utils.EventType eventType = Utils.EventType.valueOf(resultData.getString(API_EVENT_TYPE));
             ServerRequestController.parseServerResponse(getActivity(), eventType, jsonObject, resultCode, mReceiver);
-
 
         } catch (JSONException e) {
             e.printStackTrace();
